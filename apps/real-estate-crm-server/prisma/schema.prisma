@@ -1,0 +1,69 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Client {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  firstName    String?
+  phone        String?
+  lastName     String?
+  email        String?
+  appointments Appointment[]
+}
+
+model AgentAssignment {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  agent      String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId String?
+}
+
+model Property {
+  id               String               @id @default(cuid())
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  name             String?
+  address          String?
+  status           EnumPropertyStatus[]
+  price            Float?
+  agent            String?
+  appointments     Appointment[]
+  agentAssignments AgentAssignment[]
+}
+
+model Appointment {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  date       DateTime?
+  time       DateTime?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  propertyId String?
+  client     Client?   @relation(fields: [clientId], references: [id])
+  clientId   String?
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName String?
+  lastName  String?
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  roles     Json
+}
+
+enum EnumPropertyStatus {
+  Option1
+}
